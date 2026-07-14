@@ -119,6 +119,7 @@ function mapPokemonListResult(result: PokemonAPIResult): PokemonListItem {
 function mapPokemonDetail(
   data: PokemonAPIResponse,
   description: string,
+  evolutionChainId: number | null,
 ): PokemonDetail {
   return {
     id: data.id,
@@ -140,6 +141,7 @@ function mapPokemonDetail(
     ),
     sprites: data.sprites,
     description,
+    evolutionChainId,
   };
 }
 
@@ -209,7 +211,7 @@ export async function getPokemonByNameOrId(
 
   const speciesData = await getPokemonSpecies(data.id);
 
-  return mapPokemonDetail(data, speciesData.description);
+  return mapPokemonDetail(data, speciesData.description, speciesData.evolutionChainId);
 }
 
 export async function getPokemonSpecies(
