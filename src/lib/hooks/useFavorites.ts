@@ -1,34 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
-
-const STORAGE_KEY = "pokedex_favorites";
+import { useContext } from "react";
+import { FavoritesContext } from "@/lib/providers/FavoritesProvider";
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<number[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  const isFavorite = useCallback(
-    (id: number) => favorites.includes(id),
-    [favorites],
-  );
-
-  const toggleFavorite = useCallback((id: number) => {
-    setFavorites((prev) => {
-      const next = prev.includes(id)
-        ? prev.filter((fid) => fid !== id)
-        : [...prev, id];
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      return next;
-    });
-  }, []);
-
-  return { favorites, isFavorite, toggleFavorite };
+  const context = useContext(FavoritesContext);
+  if (!context) {
+    throw new Error("useFavorites must be used within a FavoritesProvider");
+  }
+  return context;
 }
