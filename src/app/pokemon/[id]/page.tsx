@@ -4,7 +4,7 @@ import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { getPokemonByNameOrId, getEvolutionChain } from "@/services";
 import type { PokemonDetail, EvolutionChain, Stat } from "@/types";
-import { useFavorites } from "@/lib/hooks";
+import { useFavorites, usePokemonCry } from "@/lib/hooks";
 import { formatPokemonId, capitalize, getTypeColor } from "@/lib/utils";
 
 interface PokemonPageProps {
@@ -108,6 +108,82 @@ function EvolutionSection({
         </div>
       ))}
     </div>
+  );
+}
+
+function SoundButton({ url }: { url: string | null }) {
+  const { isPlaying, isLoading, error, toggle } = usePokemonCry({ url });
+
+  if (!url) return null;
+
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      disabled={isLoading}
+      className="relative inline-flex size-9 items-center justify-center rounded-full text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-50 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+      aria-label={isPlaying ? "Stop sound" : "Play sound"}
+      title={
+        isPlaying
+          ? "Stop sound"
+          : error
+            ? "Try again"
+            : "Play sound"
+      }
+    >
+      {isLoading ? (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          className="size-5 animate-pulse"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M11 5L6 9H2v6h4l5 4V5z"
+          />
+        </svg>
+      ) : (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={1.5}
+          className="size-5"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M11 5L6 9H2v6h4l5 4V5z"
+          />
+          {isPlaying && (
+            <>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.54 8.46a5 5 0 010 7.07"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19.07 4.93a10 10 0 010 14.14"
+              />
+            </>
+          )}
+          {error && !isPlaying && (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M18 6L6 18M6 6l12 12"
+            />
+          )}
+        </svg>
+      )}
+    </button>
   );
 }
 
@@ -235,10 +311,11 @@ export default function PokemonPage({ params }: PokemonPageProps) {
           )}
         </div>
 
-        <div className="mt-3 flex items-center gap-2">
+        <div className="mt-3 flex items-center justify-center gap-2">
           {pokemon.types.map((t) => (
             <TypeBadge key={t} type={t} />
           ))}
+          <SoundButton url={pokemon.cries?.latest ?? null} />
         </div>
 
         <button
