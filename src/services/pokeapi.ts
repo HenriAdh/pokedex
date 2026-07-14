@@ -53,6 +53,11 @@ interface PokemonSpritesAPI {
   };
 }
 
+interface PokemonCriesAPI {
+  latest: string;
+  legacy: string;
+}
+
 interface PokemonAPIResponse {
   id: number;
   name: string;
@@ -62,6 +67,7 @@ interface PokemonAPIResponse {
   stats: PokemonStatAPI[];
   abilities: PokemonAbilityAPI[];
   sprites: PokemonSpritesAPI;
+  cries: PokemonCriesAPI;
 }
 
 interface PokemonSpeciesAPIResponse {
@@ -140,6 +146,7 @@ function mapPokemonDetail(
       }),
     ),
     sprites: data.sprites,
+    cries: data.cries,
     description,
     evolutionChainId,
   };
