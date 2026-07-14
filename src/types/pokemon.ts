@@ -67,6 +67,7 @@ export interface PokemonDetail {
   abilities: Ability[];
   sprites: Sprites;
   description: string;
+  evolutionChainId: number | null;
 }
 
 export interface EvolutionStage {
