@@ -57,6 +57,11 @@ export interface Ability {
   isHidden: boolean;
 }
 
+export interface Cries {
+  latest: string;
+  legacy: string;
+}
+
 export interface PokemonDetail {
   id: number;
   name: string;
@@ -66,6 +71,7 @@ export interface PokemonDetail {
   stats: Stat[];
   abilities: Ability[];
   sprites: Sprites;
+  cries: Cries;
   description: string;
   evolutionChainId: number | null;
 }
