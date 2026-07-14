@@ -4,7 +4,8 @@ import { use, useState, useEffect } from "react";
 import Link from "next/link";
 import { getPokemonByNameOrId, getEvolutionChain } from "@/services";
 import type { PokemonDetail, EvolutionChain, Stat } from "@/types";
-import { useFavorites, usePokemonCry } from "@/lib/hooks";
+import { useFavorites } from "@/lib/hooks";
+import { SoundButton } from "@/components/ui";
 import { formatPokemonId, capitalize, getTypeColor } from "@/lib/utils";
 
 interface PokemonPageProps {
@@ -315,7 +316,7 @@ export default function PokemonPage({ params }: PokemonPageProps) {
           {pokemon.types.map((t) => (
             <TypeBadge key={t} type={t} />
           ))}
-          <SoundButton url={pokemon.cries?.latest ?? null} />
+          <SoundButton url={pokemon.cries?.latest ?? null} pokemonName={pokemon.name} />
         </div>
 
         <button
