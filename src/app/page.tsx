@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { Suspense, useState, useEffect, useMemo, useCallback } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { getPokemonList, getPokemonByType, PAGE_LIMIT } from "@/services";
 import type { PokemonListItem, PokemonType } from "@/types";
 import { useDebounce } from "@/lib/hooks";
@@ -10,11 +11,35 @@ import { SearchBar, TypeFilter, Pagination, SkeletonCard } from "@/components/ui
 const ALL_LIMIT = 2000;
 
 export default function HomePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <PokemonGrid>
+            {Array.from({ length: PAGE_LIMIT }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </PokemonGrid>
+        </div>
+      }
+    >
+      <HomePageContent />
+    </Suspense>
+  );
+}
+
+function HomePageContent() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const search = searchParams.get("search") ?? "";
+  const selectedType = (searchParams.get("type") as PokemonType | "") ?? "";
+  const rawPage = Math.floor(Number(searchParams.get("page")));
+  const page = rawPage >= 1 ? rawPage : 1;
+
   const [allPokemon, setAllPokemon] = useState<PokemonListItem[]>([]);
   const [typePokemon, setTypePokemon] = useState<PokemonListItem[] | null>(null);
-  const [search, setSearch] = useState("");
-  const [selectedType, setSelectedType] = useState<PokemonType | "">("");
-  const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [typeLoading, setTypeLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -55,16 +80,43 @@ export default function HomePage() {
     fetchByType();
   }, [selectedType]);
 
-  const handleSearchChange = useCallback((value: string) => {
-    setSearch(value);
-    setPage(1);
-  }, []);
+  const handleSearchChange = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (value) {
+        params.set("search", value);
+      } else {
+        params.delete("search");
+      }
+      params.delete("page");
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname, searchParams],
+  );
 
-  const handleTypeChange = useCallback((type: PokemonType | "") => {
-    setSelectedType(type);
-    setTypePokemon(null);
-    setPage(1);
-  }, []);
+  const handleTypeChange = useCallback(
+    (type: PokemonType | "") => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (type) {
+        params.set("type", type);
+      } else {
+        params.delete("type");
+      }
+      setTypePokemon(null);
+      params.delete("page");
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname, searchParams],
+  );
+
+  const handlePageChange = useCallback(
+    (newPage: number) => {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("page", String(newPage));
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname, searchParams],
+  );
 
   const filteredPokemon = useMemo(() => {
     const list = selectedType ? (typePokemon ?? []) : allPokemon;
@@ -121,7 +173,7 @@ export default function HomePage() {
           <Pagination
             page={safePage}
             totalPages={totalPages}
-            onPageChange={setPage}
+            onPageChange={handlePageChange}
           />
         </>
       )}
