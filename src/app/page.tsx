@@ -84,7 +84,7 @@ function HomePageContent() {
       } else {
         params.delete("search");
       }
-      params.delete("page");
+      params.set("page", "1");
       router.push(`${pathname}?${params.toString()}`);
     },
     [router, pathname, searchParams],
@@ -99,7 +99,7 @@ function HomePageContent() {
         params.delete("type");
       }
       setTypePokemon(null);
-      params.delete("page");
+      params.set("page", "1");
       router.push(`${pathname}?${params.toString()}`);
     },
     [router, pathname, searchParams],
