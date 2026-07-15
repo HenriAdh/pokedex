@@ -6,7 +6,7 @@ import { getPokemonList, getPokemonByType, PAGE_LIMIT } from "@/services";
 import type { PokemonListItem, PokemonType } from "@/types";
 import { useDebounce } from "@/lib/hooks";
 import { PokemonCard, PokemonGrid } from "@/components/pokemon";
-import { SearchBar, TypeFilter, Pagination, SkeletonCard } from "@/components/ui";
+import { SearchBar, TypeFilter, Pagination, SkeletonCard, SkeletonGrid } from "@/components/ui";
 
 const ALL_LIMIT = 2000;
 
@@ -15,11 +15,7 @@ export default function HomePage() {
     <Suspense
       fallback={
         <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          <PokemonGrid>
-            {Array.from({ length: PAGE_LIMIT }).map((_, i) => (
-              <SkeletonCard key={i} />
-            ))}
-          </PokemonGrid>
+          <SkeletonGrid />
         </div>
       }
     >
